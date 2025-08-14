@@ -1,6 +1,4 @@
-# translate English sentence to Japanese
-# only translate the sentence to Japanese after the "--" line
-# and add a new line after the Japanese sentence
+
 
 T
 RANSFORMERS [1] are a general purpose model with
@@ -164,9 +162,7 @@ Continual Retroactive Attention is defined as follows:
 継続的なトランスフォーマー[28]は、継続的な推論設定のSDAの定式化を適応させ、以前の推論ステップで実行された計算を再利用する継続的な遡及アテンションの定式化を導き出します。継続的な遡及アテンションは次のように定義されます。
 
 -
-# translate English sentence to Japanese
-# only translate the sentence to Japanese after the "--" line
-# and add a new line after the Japanese sentence
+
 
 In the above, qnew, knew and vnew are the newest tokens
 corresponding to the new query, key and value, respectively, ⊙
@@ -176,9 +172,7 @@ denotes a column-aligned element-wise multiplication operation, 1n is a row-vect
 
 上記では、qnew、knew、およびvnewは、それぞれ新しいクエリ、キー、および値に対応する最新のトークンであり、⊙は列揃えの要素ごとの乗算操作を示し、1nはn個の1の行ベクトルです。
 
--
-# translate English sentence to Japanese
-# only translate the sentence to Japanese after the "--" line
+
 
 where the AV matrix is the result of the multiplication
 between the A and V matrices, ϕ(Aˆ) and AVˆ are the matrices
@@ -701,3 +695,68 @@ use compared to competing models.
 --
 
 本論文では、継続的な推論に適したNystrom近似に基づくスケールドドットプロダクトアテンションの新しい定式化を導入しました。これを行うために、継続的な方法でNystromベースのSDAのモデル更新を導出し、SDA近似に必要なランドマークを決定するための継続的なストリームデータを処理するために調整された2つの方法を提案しました。結果として得られたモデルは、入力トークンの数に関して線形の計算コストとメモリコストを持ち、競合するモデルと比較してより高速な推論時間を実現し、同等または低いメモリを必要とします。オーディオ分類とオンラインアクション検出に関する実験では、提案されたモデルが競合するモデルと比較して、同様のパフォーマンスとメモリ使用量を維持しながら、最大2桁の操作数の削減につながることが示されています。
+-
+
+# 英文を日本語に翻訳してください。
+# 英文の最後に---とつけるのでそこまでを翻訳し、日本語の文章を続けてください。
+
+We also propose a process for determining appropriate landmarks during the training phase, which can then be used for
+processing any received input, avoiding the need to perform
+landmark updates during Continual Inference. This approach is
+motivated by similar ideas used in approximate kernel-based
+learning [36], [37], where landmarks in Nystrom-based ap-
+proximation of the kernel matrix are determined by clustering
+the training data. However, this approach cannot be directly
+applied in our case, as the data transformations performed by
+all layers before each of the SDA blocks change at every
+training update, leading to different feature spaces in which
+the matrices XQ and XK are defined.
+---
+# translate 703-713
+このプロセスは、トレーニングフェーズ中に適切なランドマークを決定するためのプロセスを提案します。これにより、受信した入力を処理する際にランドマークの更新を行う必要がなくなります。このアプローチは、Nystromベースのカーネル行列の近似において、トレーニングデータをクラスタリングすることによってランドマークが決定されるという、近似カーネルベースの学習[36][37]で使用される類似のアイデアに基づいています。ただし、このアプローチは、各SDAブロックの前にすべての層で行われるデータ変換がトレーニングの更新ごとに変化し、行列XQとXKが定義される異なる特徴空間につながるため、私たちのケースには直接適用できません。
+---
+
+To address this issue, the training process is divided into two
+phases. In the first phase, the model is trained in an end-to-end
+manner using continually updated landmarks as described in
+Section IV-A. The second phase is divided into two processing
+steps. In the first step, the training data is introduced to the
+model and the matrices Q and K are calculated for each input
+data sample. The Q-tokens corresponding to all training data
+are combined to create a dataset which is clustered into m
+clusters by applying the m-Means method. The cluster centers
+are then used to form the matrix Q˜. The same process is
+applied to the K-tokens to form the matrix K˜ . If multiple
+SDA heads are used, we compute the landmarks of each head
+independently. In the second step, the model is fine-tuned in
+an end-to-end manner using the now fixed, landmarks (i.e.,
+the matrices Q˜ and K˜ are not updated). When the model is
+formed by multiple SDA blocks, the two steps of phase two are
+applied sequentially starting from the first block, and keeping
+all landmarks of previous SDA blocks fixed in the fine-tuning
+step. This leads to gradually determining all landmarks of the
+model.
+---
+この問題に対処するために、トレーニングプロセスは2つのフェーズに分割されます。最初のフェーズでは、セクションIV-Aで説明したように、継続的に更新されたランドマークを使用して、モデルがエンドツーエンドの方法でトレーニングされます。2番目のフェーズは、2つの処理ステップに分かれています。最初のステップでは、トレーニングデータがモデルに導入され、各入力データサンプルについて行列QとKが計算されます。すべてのトレーニングデータに対応するQトークンを組み合わせて、m-Meansメソッドを適用してmクラスタにクラスタリングされたデータセットを作成します。次に、クラスタセンターを使用して行列Q˜を形成します。同じプロセスがKトークンにも適用され、行列K˜が形成されます。複数のSDAヘッドが使用される場合は、それぞれのヘッドのランドマークを独立して計算します。2番目のステップでは、今や固定されたランドマーク(つまり、行列Q˜とK˜は更新されません)を使用して、モデルがエンドツーエンドの方法で微調整されます。モデルが複数のSDAブロックで構成されている場合は、最初のブロックから始めて2つのステップを順次適用し、微調整ステップで前のSDAブロックのすべてのランドマークを固定します。これにより、モデルのすべてのランドマークが徐々に決定されます。
+---
+
+ For training, we use a modified version of the noncontinual model with the circular positional encoding
+described above and the corresponding landmark selection scheme as described in Sections IV-A and IV-B,
+depending on whether continual or fixed landmarks are
+used, respectively. We follow this approach as the noncontinual training processes are faster when the entire
+sequence is available from the beginning, and both continual and non-continual SDA variants produce identical
+results.
+---
+トレーニングには、上記で説明した円形の位置エンコーディングと、セクションIV-AおよびIV-Bで説明されている対応するランドマーク選択スキームを使用して、非継続的なモデルの修正バージョンを使用します。これは、継続的または固定されたランドマークがそれぞれ使用されるかどうかに応じて行われます。このアプローチに従うのは、非継続的なトレーニングプロセスが最初からシーケンス全体が利用可能な場合により高速であり、継続的および非継続的なSDAバリアントの両方が同一の結果を生成するためです。
+---
+
+ The first (n mod m) landmarks
+are calculated by using a segment of the token sequence
+that has an extra token. The position of these landmarks
+is tracked as newer landmarks are included and older
+landmarks are discarded, so every new landmark will be
+calculated using a segment of the token sequence of the
+same size as the landmark it is replacing
+---
+最初の(n mod m)ランドマークは、追加のトークンを持つトークンシーケンスのセグメントを使用して計算されます。これらのランドマークの位置は、新しいランドマークが含まれ、古いランドマークが破棄されるにつれて追跡されるため、すべての新しいランドマークは、それが置き換えるランドマークと同じサイズのトークンシーケンスのセグメントを使用して計算されます。
+---
