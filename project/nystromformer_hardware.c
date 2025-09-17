@@ -54,6 +54,7 @@ for (i=0, i<n, i++){
     for (j=0, j<m, j++){
         for (k=0, k<d, k++){
             kernel_1[i][j] += query[i][k] * k_landmarks[j][k]
+            kernel_1[i][j] /= sqrt(d) // 16
         }
     }
 }
@@ -62,6 +63,7 @@ for (i=0, i<m, i++){
     for (j=0, j<m, j++){
         for (k=0, k<d, k++){
             kernel_2[i][j] += q_landmarks[i][k] * k_landmarks[j][k]
+            kernel_2[i][j] /= sqrt(d) // 16
         }
     }
 }
@@ -70,12 +72,13 @@ for (i=0, i<m, i++){
     for (j=0, j<n, j++){
         for (k=0, k<d, k++){
             kernel_3[i][j] += q_landmarks[i][k] * key[j][k]
+            kernel_3[i][j] /= sqrt(d) // 16
         }
     }
 }
 
 // softmaxの実装考える！！！
-// スケーリングも
+// スケーリングも <- DONE
 
 // 4. iterative_inv
 // V0
