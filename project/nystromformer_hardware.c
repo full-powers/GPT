@@ -9,7 +9,6 @@ float sum_row[m] = {0}, sum_column[m] = {0};
 float V[m][m] = {0}, KV[m][m] = {0};
 float matmul_1[m][m] = {0}, matmul_2[m][m] = {0}, matmul_3[m][m] = {0};
 float output_1[n][m] = {0}, output_2[m][d] = {0}, out[n][d] = {0};
-float Value[n][d];
 
 const int n = 256;
 const int m = 4;
@@ -181,7 +180,7 @@ for (i = 0; i < m; i++) {
     for (j = 0; j < d; j++) {
         output_2[i][j] = 0;
         for (k = 0; k < n; k++) {
-            output_2[i][j] += kernel_3[i][k] * Value[k][j];
+            output_2[i][j] += kernel_3[i][k] * value[k][j];
         }
     }
 }
