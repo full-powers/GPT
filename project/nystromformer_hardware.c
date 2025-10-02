@@ -62,6 +62,7 @@ for (k = 0; k < m; k++) {
 }
 
 // 3. to softmax
+// softmaxの実装は考え中
 // kernel_1 (q * k_landmarks^T)
 for (i = 0; i < n; i++) {
     for (j = 0; j < m; j++) {
