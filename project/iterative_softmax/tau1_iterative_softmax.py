@@ -18,10 +18,10 @@ def replicator_dynamics(t, z, w, tau=1.0):
 # 2. パラメータと初期条件の設定
 # いろんな入力パターンを定義
 input_patterns = {
-    'balanced': np.array([1.0, 1.0, 1.0]),  # 均等な入力
+#    'balanced': np.array([1.0, 1.0, 1.0]),  # 均等な入力
     'sparse': np.array([0.1, 0.2, 2.0]),    # スパースな入力
     'original': np.array([1.0, 0.8, 1.2]),  # 元の入力
-    'negative': np.array([-0.5, 0.2, 1.0]), # 負の値を含む入力
+#    'negative': np.array([-0.5, 0.2, 1.0]), # 負の値を含む入力
     'large_diff': np.array([0.1, 1.0, 5.0]), # 大きな差のある入力
     'five_dim': np.array([0.5, 1.0, 0.3, 2.0, 0.8]), # 5次元の入力
 }
