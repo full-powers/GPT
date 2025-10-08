@@ -2,12 +2,12 @@
 #include <stdint.h>
 #include <math.h>
 
-// 16ビット固定小数点: 2ビット整数部 + 14ビット小数部
+// s2.13
 typedef int16_t fixed16_t;
-#define FIXED_SCALE 16384  // 2^14
+#define FIXED_SCALE 8192  // 2^13
 #define FIXED_ONE FIXED_SCALE
 
-// 固定小数点変換関数
+// double <-> fixed16_t
 fixed16_t double_to_fixed(double x) {
     return (fixed16_t)(x * FIXED_SCALE);
 }
@@ -16,27 +16,27 @@ double fixed_to_double(fixed16_t x) {
     return (double)x / FIXED_SCALE;
 }
 
-// 固定小数点乗算
+// fixed-point mul
 fixed16_t fixed_mul(fixed16_t a, fixed16_t b) {
-    return (fixed16_t)(((int32_t)a * b) >> 14);
+    return (fixed16_t)(((int32_t)a * b) >> 13);
 }
 
-// 固定小数点除算
+// fixed-point div
 fixed16_t fixed_div(fixed16_t a, fixed16_t b) {
-    return (fixed16_t)(((int32_t)a << 14) / b);
+    return (fixed16_t)(((int32_t)a << 13) / b);
 }
 
 int main() {
-    // 固定小数点で入力値を定義
+    // input, tau
     fixed16_t w[3] = {double_to_fixed(2.0), double_to_fixed(0.2), double_to_fixed(0.7)}; // input
     fixed16_t tau = double_to_fixed(1.0);
     
-    // dt*steps = 1 になる複数の組み合わせ
-    double dt_values[] = {0.005, 0.01, 0.02, 0.05, 0.1, 0.2};
-    int steps_values[] = {200, 100, 50, 20, 10, 5};
-    int num_cases = 6;
+    // dt*steps = 1
+    double dt_values[] = {0.005, 0.0078125, 0.01, 0.015625, 0.02, 0.05, 0.1, 0.2};
+    int steps_values[] = {200, 128, 100, 64, 50, 20, 10, 5};
+    int num_cases = 8;
 
-    // 理論値（softmax）を最初に表示
+    // softmax (theory)
     double w_theory[3] = {2.0, 0.2, 0.7};
     double theory[3];
     for (int i = 0; i < 3; ++i) {
@@ -45,7 +45,7 @@ int main() {
     printf("Theory (softmax): [%.6f %.6f %.6f]\n\n", theory[0], theory[1], theory[2]);
 
     for (int case_idx = 0; case_idx < num_cases; case_idx++) {
-        // 固定小数点版
+        // softmax (fixed-point)
         fixed16_t dt_fixed = double_to_fixed(dt_values[case_idx]);
         int steps = steps_values[case_idx];
         
@@ -63,8 +63,8 @@ int main() {
                 z_fixed[i] += fixed_mul(dz[i], dt_fixed);
             }
         }
-        
-        // double版（参考値）
+
+        // softmax (double)
         double w_double[3] = {2.0, 0.2, 0.7};
         double z_double[3] = {0.1, 0.1, 0.1};
         double dt_double = dt_values[case_idx];
@@ -80,7 +80,7 @@ int main() {
             }
         }
         
-        // 結果の正規化と表示
+        // normalize
         fixed16_t sum_z_fixed = z_fixed[0] + z_fixed[1] + z_fixed[2];
         double sum_z_double = z_double[0] + z_double[1] + z_double[2];
         
@@ -90,7 +90,7 @@ int main() {
             z_norm_double[i] = z_double[i] / sum_z_double;
         }
         
-        // 誤差計算（既に計算済みの理論値を使用）
+        // error
         double error_fixed = 0, error_double = 0;
         for (int i = 0; i < 3; ++i) {
             error_fixed += fabs(z_norm_fixed[i] - theory[i]);

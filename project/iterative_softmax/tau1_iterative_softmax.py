@@ -29,15 +29,15 @@ input_patterns = {
 # z_i の初期値 (t=0 のときの値)
 # 全ての要素が0から始まると変化しないため、小さな正の値を与える
 def get_initial_values(n):
-    return np.array([0.1] * n)
+    return np.array([0.125] * n)
 
 # 計算する時間の範囲 (0秒から10秒まで)
-t_span = [0, 10]
+t_span = [0, 1]
 # グラフ描画のために、計算結果を出力する時間点を指定
 t_eval = np.linspace(t_span[0], t_span[1], 500)
 
 # 変化率tauの設定
-tau = 0.1
+tau = 1.0
 
 # 3. 各入力パターンでの比較実験
 for pattern_name, w in input_patterns.items():
