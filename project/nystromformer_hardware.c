@@ -72,6 +72,41 @@ for (i = 0; i < n; i++) {
         kernel_1[i][j] /= 16.0f; // sqrt(d) = 16
     }
 }
+// softmax(kernel_1)
+float kernel_1_softmax[n][m] = {0};
+float z[m] = {0}, dz[m] = {0};
+float sum_z;
+const int steps = 64;
+const float dt = 0.015625f;
+
+for (i = 0; i < n; i++) {
+    for (int t = 0; t <= steps; t++) {
+        // init 
+        if (t == 0) {
+            for (j = 0; j < m; j++) {
+                z[j] = 0.125f;
+            }
+            sum_z = 0.125f * m;
+        } else {
+            for (j = 0; j < m; j++) {
+                dz[j] = z[j] * (kernel_1[i][j] - sum_z);
+            }
+            for (j = 0; j < m; j++) {
+                z[j] += dz[j] * dt;
+            }
+            // update sum_z
+            sum_z = 0.0f;
+            for (j = 0; j < m; j++) {
+                sum_z += z[j];
+            }
+        }
+    }
+    // normalize
+    for (j = 0; j < m; j++) {
+        kernel_1_softmax[i][j] = z[j] / sum_z;
+    }
+}
+
 // kernel_2 (q_landmarks * k_landmarks^T)
 for (i = 0; i < m; i++) {
     for (j = 0; j < m; j++) {
@@ -81,6 +116,41 @@ for (i = 0; i < m; i++) {
         kernel_2[i][j] /= 16.0f;
     }
 }
+// softmax(kernel_2)
+float kernel_2_softmax[m][m] = {0};
+float z[m] = {0}, dz[m] = {0};
+float sum_z;
+const int steps = 64;
+const float dt = 0.015625f;
+
+for (i = 0; i < m; i++) {
+    for (int t = 0; t <= steps; t++) {
+        // init 
+        if (t == 0) {
+            for (j = 0; j < m; j++) {
+                z[j] = 0.125f;
+            }
+            sum_z = 0.125f * m;
+        } else {
+            for (j = 0; j < m; j++) {
+                dz[j] = z[j] * (kernel_2[i][j] - sum_z);
+            }
+            for (j = 0; j < m; j++) {
+                z[j] += dz[j] * dt;
+            }
+            // update sum_z
+            sum_z = 0.0f;
+            for (j = 0; j < m; j++) {
+                sum_z += z[j];
+            }
+        }
+    }
+    // normalize
+    for (j = 0; j < m; j++) {
+        kernel_2_softmax[i][j] = z[j] / sum_z;
+    }
+}
+
 // kernel_3 (q_landmarks * key)
 for (i = 0; i < m; i++) {
     for (j = 0; j < n; j++) {
@@ -88,6 +158,40 @@ for (i = 0; i < m; i++) {
             kernel_3[i][j] += q_landmarks[i][k] * key[j][k];
         }
         kernel_3[i][j] /= 16.0f;
+    }
+}
+// softmax(kernel_3)
+float kernel_3_softmax[m][n] = {0};
+float z[n] = {0}, dz[n] = {0};
+float sum_z;
+const int steps = 64;
+const float dt = 0.015625f;
+
+for (i = 0; i < m; i++) {
+    for (int t = 0; t <= steps; t++) {
+        // init 
+        if (t == 0) {
+            for (j = 0; j < n; j++) {
+                z[j] = 0.125f;
+            }
+            sum_z = 0.125f * n;
+        } else {
+            for (j = 0; j < n; j++) {
+                dz[j] = z[j] * (kernel_3[i][j] - sum_z);
+            }
+            for (j = 0; j < n; j++) {
+                z[j] += dz[j] * dt;
+            }
+            // update sum_z
+            sum_z = 0.0f;
+            for (j = 0; j < n; j++) {
+                sum_z += z[j];
+            }
+        }
+    }
+    // normalize
+    for (j = 0; j < n; j++) {
+        kernel_3_softmax[i][j] = z[j] / sum_z;
     }
 }
 
